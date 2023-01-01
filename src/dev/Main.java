@@ -2,6 +2,6 @@ package dev;
 
 public class Main {
     public static void main(String[] args) {
-        new SimpleStruct("foo", 12);
+        SimpleStruct.construct("foo", 12);
     }
 }
