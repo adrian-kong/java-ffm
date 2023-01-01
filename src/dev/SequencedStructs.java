@@ -5,6 +5,9 @@ import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemoryLayout.PathElement;
 import java.lang.foreign.MemorySession;
 import java.lang.invoke.VarHandle;
+import java.util.logging.MemoryHandler;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static dev.SimpleStruct.DOG_STRUCT;
 import static java.lang.foreign.ValueLayout.JAVA_INT;
@@ -40,23 +43,32 @@ public class SequencedStructs {
      * "dogs" -> sequence -> "age"
      * groupElement(dogs) -> sequenceElement() -> groupElement(age)
      */
-    private static final VarHandle DOGS_VH = DOG_COLLECTION.varHandle(PathElement.groupElement("dogs"), PathElement.sequenceElement(), PathElement.groupElement("age"));
+    private static final VarHandle DOGS_VH = DOG_COLLECTION.varHandle(
+            PathElement.groupElement("dogs"),
+            PathElement.sequenceElement(),
+            PathElement.groupElement("age")
+    );
+//    private static final VarHandle AGE_VH = DOGS_VH.varHandle(PathElement.groupElement("age"));
     /**
      * As above, we represent name as char[16]
      * Hence we will need to group by 'name' then apply sequenceElement after.
      */
-    private static final VarHandle NAME_VH = DOG_COLLECTION.varHandle(PathElement.groupElement("name"), PathElement.sequenceElement());
-
+    private static final VarHandle NAME_VH = DOG_COLLECTION.varHandle(
+            PathElement.groupElement("name"),
+            PathElement.sequenceElement()
+    );
 
     public static void construct(String name) {
         try (MemorySession session = MemorySession.openConfined()) {
             var segment = session.allocate(DOG_COLLECTION);
 
-            DOGS_VH.set(segment, 1, 1);
+            DOGS_VH.set(segment, 0, 1);
+            DOGS_VH.set(segment, 1, 2);
             Utils.putString(segment, NAME_VH, name);
-
             System.out.println("name: " + Utils.collectString(segment, NAME_VH, 16));
 
+            // print out List of ages
+            System.out.println(IntStream.range(0, 16).mapToObj(i -> DOGS_VH.get(segment, i)).collect(Collectors.toList()));
         }
 
     }

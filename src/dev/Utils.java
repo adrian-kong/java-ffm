@@ -17,6 +17,7 @@ public class Utils {
     }
 
     public static void putString(MemorySegment segment, VarHandle handle, String str) {
+        // TIL primitive is not object so we cant use putArray, will need to box char[] to Character[]
         for (int i = 0; i < str.length(); i++) {
             handle.set(segment, i, str.charAt(i));
         }
