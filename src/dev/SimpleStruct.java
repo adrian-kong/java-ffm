@@ -2,6 +2,7 @@ package dev;
 
 import java.io.Closeable;
 import java.lang.foreign.*;
+import java.lang.foreign.MemoryLayout.PathElement;
 import java.lang.invoke.VarHandle;
 
 import static java.lang.foreign.ValueLayout.JAVA_INT;
@@ -19,8 +20,8 @@ public class SimpleStruct {
     );
 
 
-    private static final VarHandle AGE_VH = DOG_STRUCT.varHandle(MemoryLayout.PathElement.groupElement("age"));
-    private static final VarHandle NAME_VH = DOG_STRUCT.varHandle(MemoryLayout.PathElement.groupElement("name"), MemoryLayout.PathElement.sequenceElement());
+    private static final VarHandle AGE_VH = DOG_STRUCT.varHandle(PathElement.groupElement("age"));
+    private static final VarHandle NAME_VH = DOG_STRUCT.varHandle(PathElement.groupElement("name"), PathElement.sequenceElement());
 
     public static void construct(String name, int age) {
         try (MemorySession session = MemorySession.openConfined()) {
